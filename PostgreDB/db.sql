@@ -9,4 +9,6 @@ CREATE TABLE messages (
 SELECT *
 FROM messages
 WHERE receiver_email = 'ALL';
-select * from messages;
+select * from messages 
+WHERE LENGTH(your_message_colum) > 50;
+-- DELETE FROM your_table_nam    

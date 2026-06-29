@@ -143,53 +143,34 @@ export class AnalyticsComponent implements OnInit {
         datasets: [{ label: 'Message Stats', data: [toAdmin, fromAdmin, others], backgroundColor: ['#3b82f6', '#10b981', '#ef4444'] }]
       },
       options: {
-
         responsive: true,
-
         maintainAspectRatio: false,
-
         plugins: {
-
           legend: {
-
             labels: {
               color: '#fff'
             }
-
           }
-
         },
-
         scales: {
-
           x: {
-
             ticks: {
               color: '#fff'
             },
-
             grid: {
               color: 'rgba(255,255,255,0.08)'
             }
-
           },
-
           y: {
-
             beginAtZero: true,
-
             ticks: {
               color: '#fff'
             },
-
             grid: {
               color: 'rgba(255,255,255,0.08)'
             }
-
           }
-
         }
-
       }
     });
   }

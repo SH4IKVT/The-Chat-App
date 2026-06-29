@@ -53,93 +53,124 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit() {
-    // ✅ TAB LOCK SYSTEM
-    const email =
-      sessionStorage.getItem('email');
-    if (email) {
+
+    // ===========================
+    // TAB LOCK SYSTEM
+    // ===========================
+    const email = sessionStorage.getItem('email');
+
+    if (email && email.toLowerCase() !== 'admin@gmail.com') {
+
       // CREATE TAB ID
       if (!sessionStorage.getItem('tabId')) {
-
         sessionStorage.setItem(
           'tabId',
           crypto.randomUUID()
         );
       }
+
       const tabId =
         sessionStorage.getItem('tabId');
+
       const storageKey =
         `activeTab_${email}`;
+
       const existingTab =
         localStorage.getItem(storageKey);
+
       // BLOCK SAME USER
       if (
         existingTab &&
         existingTab !== tabId
       ) {
+
         alert(
           'This user is already active in another tab'
         );
+
         sessionStorage.clear();
+
         this.router.navigate(['/']);
+
         return;
       }
+
       // REGISTER TAB
       localStorage.setItem(
         storageKey,
         tabId || ''
       );
+
       // REMOVE LOCK ON CLOSE
       window.addEventListener(
         'beforeunload',
         () => {
+
           const active =
             localStorage.getItem(storageKey);
+
           if (active === tabId) {
+
             localStorage.removeItem(storageKey);
+
           }
+
         }
       );
     }
-    // ✅ LOAD USERS FOR MULTI SELECT
+
+    // ===========================
+    // LOAD USERS
+    // ===========================
     this.auth.getUsers().subscribe({
       next: (res: any[]) => {
-        this.allUsers = res.filter(u =>
-          u.email.toLowerCase() !== this.userEmail
+        this.allUsers = res.filter(
+          u => u.email.toLowerCase() !== this.userEmail
         );
         this.cd.detectChanges();
       }
     });
-    // ✅ LOAD USERS
+
     this.loadUsers();
-    // ✅ LOAD NOTICE CHAT
+
     this.loadNoticeMessages();
-    // ✅ SIGNALR
+
     this.signalR.startConnection();
+
     this.signalR.onReceiveMessage((msg) => {
-      const sender = msg.senderEmail?.toLowerCase();
-      const receiver = msg.receiverEmail?.toLowerCase();
+
+      const sender =
+        msg.senderEmail?.toLowerCase();
+
+      const receiver =
+        msg.receiverEmail?.toLowerCase();
+
       const isAdminRelated =
-        (
-          sender !== this.userEmail
-          &&
-          receiver === this.userEmail
-        );
-    if (isAdminRelated) {
-      // ✅ Prevent duplicate grouped admin messages
-      const alreadyExists = this.noticeMessages.some(m =>
-        m.text === msg.text &&
-        m.senderEmail === msg.senderEmail &&
-        (
-          new Date(m.createdAt).getTime() ===
-          new Date(msg.createdAt).getTime()
-        )
-      );
-      if (!alreadyExists) {
-        this.noticeMessages.push(msg);
-        this.cd.detectChanges();
+        sender !== this.userEmail &&
+        receiver === this.userEmail;
+
+      if (isAdminRelated) {
+
+        const alreadyExists =
+          this.noticeMessages.some(m =>
+            m.text === msg.text &&
+            m.senderEmail === msg.senderEmail &&
+            new Date(m.createdAt).getTime() ===
+            new Date(msg.createdAt).getTime()
+          );
+
+        if (!alreadyExists) {
+
+          this.noticeMessages.push(msg);
+
+          this.cd.detectChanges();
+
+        }
+
       }
-    }
+
     });
+
   }
   setTab(tab: string) {
 
